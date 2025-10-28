@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Panel - Salud & Confianza{% endblock %}
+
+{% include "barra_nav.html" %}
+
+{% block content %}
+<h2 style="text-align: center; margin-bottom: 40px;">Panel de Control</h2>
+<div class="service-grid">
+    <div class="service-item">
+        <h4>Nuevo Registro</h4>
+        <a href="{{ url_for('agregar_registro') }}" class="button">Agregar</a>
+    </div>
+    <div class="service-item">
+        <h4>Historial</h4>
+        <a href="{{ url_for('historial') }}" class="button">Ver Historial</a>
+    </div>
+    <div class="service-item">
+        <h4>Estadísticas</h4>
+        <a href="{{ url_for('estadisticas') }}" class="button">Ver Gráficos</a>
+    </div>
+</div>
+{% endblock %}

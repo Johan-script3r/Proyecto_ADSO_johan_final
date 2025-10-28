@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container is-max-desktop">
+    <h1 class="title is-2">Editar Registro: {{ metric_title }}</h1>
+    <h2 class="subtitle is-4">ID: {{ registro.id }} | Fecha original: {{ registro.fecha.strftime('%Y-%m-%d %H:%M:%S') }}</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification is-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="box">
+        <form method="POST" action="{{ url_for('editar_registro', modelo_nombre=modelo_nombre, registro_id=registro.id) }}">
+            
+            <div class="field">
+                <label class="label">Presión Sistólica (Máx)</label>
+                <div class="control">
+                    <input class="input" type="number" 
+                           name="sistolica" 
+                           value="{{ registro.sistolica }}"
+                           min="{{ sistolica_config.min }}"
+                           max="{{ sistolica_config.max }}"
+                           step="1"
+                           required>
+                </div>
+                <p class="help">Rango: {{ sistolica_config.min }} - {{ sistolica_config.max }} {{ sistolica_config.unit }}</p>
+            </div>
+
+            <div class="field">
+                <label class="label">Presión Diastólica (Mín)</label>
+                <div class="control">
+                    <input class="input" type="number" 
+                           name="diastolica" 
+                           value="{{ registro.diastolica }}"
+                           min="{{ diastolica_config.min }}"
+                           max="{{ diastolica_config.max }}"
+                           step="1"
+                           required>
+                </div>
+                <p class="help">Rango: {{ diastolica_config.min }} - {{ diastolica_config.max }} {{ diastolica_config.unit }}</p>
+            </div>
+            
+            <div class="field is-grouped mt-5">
+                <div class="control">
+                    <button type="submit" class="button is-primary">Guardar Cambios</button>
+                </div>
+                <div class="control">
+                    <a href="{{ url_for('ver_usuario_registros', usuario_id=registro.usuario_id) }}" class="button is-link is-light">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

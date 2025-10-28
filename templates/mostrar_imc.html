@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container is-max-desktop">
+    <h1 class="title is-1 has-text-centered">Tu Índice de Masa Corporal (IMC)</h1>
+    
+    <div class="columns is-centered">
+        <div class="column is-half">
+            <div class="box has-text-centered">
+                
+                <h2 class="subtitle is-4">Resultado</h2>
+                <p class="is-size-1 has-text-weight-bold has-text-primary">{{ datos_imc.imc }}</p>
+                
+                <hr>
+                
+                <h3 class="subtitle is-5">Clasificación:</h3>
+                <div class="{{ datos_imc.estilo }} is-light has-text-weight-bold is-size-4">
+                    {{ datos_imc.clasificacion }}
+                </div>
+                
+                <hr>
+
+                <p class="has-text-grey">
+                    **Cálculo basado en:**<br>
+                    Último Peso: {{ datos_imc.peso }} kg (Registrado: {{ datos_imc.fecha_peso }})<br>
+                    Última Altura: {{ datos_imc.altura }} cm (Registrada: {{ datos_imc.fecha_altura }})
+                </p>
+
+            </div>
+            
+            <div class="has-text-centered mt-5">
+                <a href="{{ url_for('agregar_registro') }}" class="button is-link is-medium">Volver al Menú de Registro</a>
+                <a href="{{ url_for('estadisticas') }}" class="button is-info is-medium">Ver Estadísticas</a>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div class="block mt-6">
+        <h2 class="title is-4">Guía Rápida de IMC</h2>
+        <div class="columns is-multiline">
+            <div class="column is-half"><div class="notification is-warning is-light">**Bajo Peso:** IMC &lt; 18.5</div></div>
+            <div class="column is-half"><div class="notification is-success is-light">**Peso Saludable:** 18.5 ≤ IMC &lt; 25</div></div>
+            <div class="column is-half"><div class="notification is-warning is-light">**Sobrepeso:** 25 ≤ IMC &lt; 30</div></div>
+            <div class="column is-half"><div class="notification is-danger is-light">**Obesidad:** IMC ≥ 30</div></div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

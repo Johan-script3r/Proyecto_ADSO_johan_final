@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title is-2">Registros de {{ usuario.nombre }} (Admin)</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if historial_data and historial_data.keys() | length > 0 %}
+        
+        {% set model_map = {
+            'ritmos_cardiacos': 'ritmo_cardiaco',
+            'presiones': 'presion_arterial',
+            'niveles_azucar': 'nivel_azucar',
+            'colesteroles': 'colesterol',
+            'oxigenos': 'oxigeno_sangre',
+            'pesos': 'peso',
+            'alturas': 'altura'
+        } %}
+
+        <div class="content">
+            {% for metric_key, records in historial_data.items() %}
+                {% if records %}
+                    {% set model_name_singular = model_map[metric_key] %}
+
+                    <h2 class="subtitle is-3 is-capitalized">{{ metric_key | replace('_', ' ') }}</h2>
+                    <div class="table-container">
+                        <table class="table is-striped is-fullwidth is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    {% if metric_key == 'presiones' %}
+                                        <th>Sistólica (mmHg)</th>
+                                        <th>Diastólica (mmHg)</th>
+                                    {% else %}
+                                        <th>Valor</th>
+                                    {% endif %}
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in records %}
+                                    <td>
+                                        <td>{{ record.id }}</td>
+                                        <td>{{ record.fecha.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                        {% if metric_key == 'presiones' %}
+                                            <td>{{ record.sistolica }}</td>
+                                            <td>{{ record.diastolica }}</td>
+                                        {% else %}
+                                            <td>{{ record.valor }}</td>
+                                        {% endif %}
+                                        <td>
+                                            <a href="{{ url_for('editar_registro', modelo_nombre=model_name_singular, registro_id=record.id) }}" class="button is-info is-small mr-2">
+                                                Editar
+                                            </a>
+                                            <form method="POST" action="{{ url_for('eliminar_registro', modelo_nombre=model_name_singular, registro_id=record.id) }}" style="display:inline;">
+                                                <button type="submit" class="button is-danger is-small" onclick="return confirm('¿Estás seguro de que quieres eliminar este registro de {{ model_name_singular | replace('_', ' ') }}?')">
+                                                    Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+    {% else %}
+        <p class="notification is-info">{{ usuario.nombre }} no tiene registros médicos en el historial.</p>
+    {% endif %}
+
+    <div class="block">
+        <a href="{{ url_for('admin_dashboard') }}" class="button is-link">Volver al Panel de Admin</a>
+    </div>
+</div>
+{% endblock %}

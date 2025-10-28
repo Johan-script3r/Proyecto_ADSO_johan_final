@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Estadísticas - Sistema de Monitoreo Médico{% endblock %}
+
+{% include "barra_nav.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line"></i> Estadísticas
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if registros %}
+                <canvas id="graficoSignos" height="100"></canvas>
+                {% else %}
+                <div class="alert alert-info">No hay datos para estadísticas.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+{% if registros %}
+    const ctx = document.getElementById('graficoSignos').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [{% for r in registros %}"{{ r.fecha.strftime('%d/%m/%Y') }}",{% endfor %}],
+            datasets: [
+                {
+                    label: 'Ritmo Cardíaco',
+                    data: [{% for r in registros %}{{ r.ritmo_cardiaco }},{% endfor %}],
+                    borderColor: 'red',
+                    fill: false
+                },
+                {
+                    label: 'Azúcar',
+                    data: [{% for r in registros %}{{ r.nivel_azucar }},{% endfor %}],
+                    borderColor: 'orange',
+                    fill: false
+                },
+                {
+                    label: 'Colesterol',
+                    data: [{% for r in registros %}{{ r.colesterol }},{% endfor %}],
+                    borderColor: 'blue',
+                    fill: false
+                },
+                {
+                    label: 'Oxígeno',
+                    data: [{% for r in registros %}{{ r.oxigeno_sangre }},{% endfor %}],
+                    borderColor: 'green',
+                    fill: false
+                }
+            ]
+        },
+        options: { responsive: true }
+    });
+{% endif %}
+</script>
+{% endblock %}

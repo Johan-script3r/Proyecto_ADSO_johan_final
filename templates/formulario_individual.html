@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container is-max-desktop">
+    <h1 class="title is-2">Registrar: {{ metric_title }}</h1>
+    <div class="box">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification is-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="field">
+                <label class="label is-size-4 has-text-weight-semibold">{{ metric_title }}</label>
+                <div class="control has-icons-right">
+                    <input 
+                        class="input is-large is-info" 
+                        type="number" 
+                        name="valor" 
+                        placeholder="Ingresa el valor" 
+                        required 
+                        min="{{ min_val }}" 
+                        max="{{ max_val }}" 
+                        step="{{ step }}">
+                    <span class="icon is-medium is-right">
+                        <span class="tag is-info is-light">{{ unit }}</span>
+                    </span>
+                </div>
+                <p class="help is-info has-text-weight-bold">Rango aceptado: {{ min_val }} - {{ max_val }} {{ unit }}</p>
+            </div>
+
+            <hr>
+            
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-primary is-medium">
+                        <span class="icon"><i class="fas fa-save"></i></span>
+                        <span>Guardar Registro</span>
+                    </button>
+                </div>
+                <div class="control">
+                    <a href="{{ url_for('agregar_registro') }}" class="button is-light is-medium">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

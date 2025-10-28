@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "barra_nav.html" %}
+
+<div class="container">
+    <h1 class="title is-2">Historial Completo de Registros</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification is-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if historial_data and historial_data.keys() | length > 0 %}
+        
+        <div class="content">
+            {% for metric_key, records in historial_data.items() %}
+                {% if records %}
+                    <h2 class="subtitle is-3 is-capitalized">{{ metric_key | replace('_', ' ') }}</h2>
+                    <div class="table-container">
+                        <table class="table is-striped is-fullwidth is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    {% if metric_key == 'presiones' %}
+                                        <th>Sistólica (mmHg)</th>
+                                        <th>Diastólica (mmHg)</th>
+                                    {% else %}
+                                        <th>Valor</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in records %}
+                                    <tr>
+                                        <td>{{ record.id }}</td>
+                                        <td>{{ record.fecha.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                        {% if metric_key == 'presiones' %}
+                                            <td>{{ record.sistolica }}</td>
+                                            <td>{{ record.diastolica }}</td>
+                                        {% else %}
+                                            <td>{{ record.valor }}</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+    {% else %}
+        
+    {% endif %}
+</div>
+{% endblock %}

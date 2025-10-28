@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administrador{% endblock %}
+
+{% include "barra_nav.html" %}
+
+{% block content %}
+    <h2 class="text-center mb-4">Panel de Administración</h2>
+    <div class="alert-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">Usuarios Registrados</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre de Usuario</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.id }}</td>
+                        <td>{{ usuario.nombre }}</td>
+                        <td>{{ usuario.rol }}</td>
+                        <td>
+                            <a href="{{ url_for('ver_usuario_registros', usuario_id=usuario.id) }}" class="btn btn-sm btn-primary">Ver Registros</a>
+                            {% if usuario.rol != 'admin' %}
+                            | <a href="{{ url_for('promover_admin', usuario_id=usuario.id) }}" class="btn btn-sm btn-outline-warning">Promover a Admin</a>
+                            |
+                            <form action="{{ url_for('eliminar_usuario', usuario_id=usuario.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario y todos sus registros? Esta acción es irreversible.');">
+                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Buscar Paciente</h4>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('admin_dashboard') }}">
+            <div class="input-group">
+                <input type="text" 
+                       name="q" 
+                       class="form-control" 
+                       placeholder="Buscar por Nombre o Correo Electrónico..." 
+                       value="{{ search_query if search_query }}"
+                       required>
+                <button class="btn btn-outline-primary" type="submit">Buscar</button>
+                {% if search_query %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">Limpiar</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <h4 class="mb-0">Lista de Usuarios (Pacientes)</h4>
+    </div>
+    <div class="card-body">
+        {% if usuarios %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Sexo</th>
+                            <th>Telefono</th>
+                            <th>Edad</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in usuarios %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.nombre }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.sexo }}</td>
+                            <td>{{ user.telefono }}</td>
+                            <td>{{ user.edad }}</td>
+                            <td>{{ user.rol }}</td>
+                            <td>
+                                <a href="{{ url_for('ver_usuario_registros', usuario_id=user.id) }}" class="btn btn-sm btn-info">Ver Registros</a>
+                                </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="notification is-info">No se encontraron usuarios.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

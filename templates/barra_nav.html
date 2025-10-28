@@ -1,0 +1,23 @@
+<header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1>Salud<span>&amp;</span>Confianza</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('index') }}">Panel</a></li>
+                    <li><a href="{{ url_for('agregar_registro') }}">Agregar</a></li>
+                    <li><a href="{{ url_for('historial') }}">Historial</a></li>
+                    <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
+                    {% if 'usuario_id' in session %}
+                        <li><a href="{{ url_for('logout') }}">Salir</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <br>
+    <br>

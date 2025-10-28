@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "barra_nav.html" %}
+
+<div class="container">
+    <h1 class="title is-2">Panel de Salud - Últimos Registros</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="columns is-multiline">
+        {% if latest_metrics %}
+            {% for metric_key, record in latest_metrics.items() %}
+                {% if record %}
+                    <div class="column is-one-third">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title is-4 is-capitalized">{{ metric_key | replace('_', ' ') }}</p>
+                                <p class="subtitle is-6">Última toma: {{ record.fecha.strftime('%Y-%m-%d %H:%M') }}</p>
+                                <p class="is-size-3">
+                                    {% if metric_key == 'presion_arterial' %}
+                                        {{ record.sistolica }}/{{ record.diastolica }} mmHg
+                                    {% elif metric_key == 'ritmo_cardiaco' %}
+                                        {{ record.valor }} ppm
+                                    {% elif metric_key == 'nivel_azucar' or metric_key == 'colesterol' %}
+                                        {{ record.valor }} mg/dL
+                                    {% elif metric_key == 'oxigeno_sangre' %}
+                                        {{ record.valor }}%
+                                    {% elif metric_key == 'peso' %}
+                                        {{ record.valor }} kg
+                                    {% elif metric_key == 'altura' %}
+                                        {{ record.valor }} cm
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+             <div class="column is-full">
+                <p class="notification is-info">No se encontraron registros recientes. Por favor, <a href="{{ url_for('agregar_registro') }}">agrega un nuevo registro</a>.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="block">
+        <a href="{{ url_for('agregar_registro') }}" class="button is-primary is-medium">Agregar Nuevo Registro</a>
+        <a href="{{ url_for('historial') }}" class="button is-link is-medium">Ver Historial</a>
+        <a href="{{ url_for('estadisticas') }}" class="button is-info is-medium">Ver Estadísticas</a>
+    </div>
+
+</div>
+{% endblock %}

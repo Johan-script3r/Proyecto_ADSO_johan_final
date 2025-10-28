@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Registros de {{ usuario.nombre }}{% endblock %}
+
+{% include "barra_nav.html" %}
+
+{% block content %}
+    <h2 class="text-center mb-4">Registros de {{ usuario.nombre }}</h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Ritmo Cardíaco</th>
+                            <th>Presión Sistólica</th>
+                            <th>Presión Diastólica</th>
+                            <th>Nivel de Azúcar</th>
+                            <th>Colesterol</th>
+                            <th>Oxígeno en Sangre</th>
+                            <th>Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for registro in registros %}
+                    <tr>
+                        <td>{{ registro.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ registro.ritmo_cardiaco }}</td>
+                        <td>{{ registro.presion_sistolica }}</td>
+                        <td>{{ registro.presion_diastolica }}</td>
+                        <td>{{ registro.nivel_azucar }}</td>
+                        <td>{{ registro.colesterol }}</td>
+                        <td>{{ registro.oxigeno_sangre }}</td>
+                        <td>{{ registro.notas }}</td>
+                        <td>
+                            <form action="{{ url_for('eliminar_registro', registro_id=registro.id) }}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este registro?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

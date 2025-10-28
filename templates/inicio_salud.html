@@ -1,0 +1,54 @@
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseñas Médicas - Salud y Confianza</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {}
+        }
+    </script>
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+    {% include "barra_nav.html" %}
+    
+    <main>
+        <section id="inicio" class="hero-section">
+            <div class="container">
+                <h2>Hola! Bienvenido a Salud y Confianza</h2>
+                <p>La página en la que podras Registrar tus datos medicos y encontrar consejos sobre el cuidado de tu salud.</p>
+                <a href="{{ url_for('index') }}" class="button">Empezar Ahora</a>
+            </div>
+        </section>
+        
+        <section id="servicios" class="services-section">
+            <div class="container">
+                <h3>Lo que Ofrecemos</h3>
+                <div class="service-grid">
+                    <div class="service-item">
+                        <img src="/static/jpg/icon_search.png" alt="Icono de Búsqueda">
+                        <h4></h4>
+                        <p></p>
+                    </div>
+                    <div class="service-item">
+                        <img src="/static/jpg/icon_review.png" alt="Icono de Reseña">
+                        <h4></h4>
+                        <p></p>
+                    </div>
+                    <div class="service-item">
+                        <img src="/static/jpg/icon_share.png" alt="Icono de Compartir">
+                        <h4></h4>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% include "pie_pagina.html"%}
+</body>
+</html>

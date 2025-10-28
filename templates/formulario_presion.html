@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container is-max-desktop">
+    <h1 class="title is-2">Registrar: Presión Arterial</h1>
+    <div class="box">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification is-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label is-size-4 has-text-weight-semibold">Presión Sistólica (Máx)</label>
+                        <div class="control">
+                            <input 
+                                class="input is-large is-info" 
+                                type="number" 
+                                name="sistolica" 
+                                placeholder="Ej: 120" 
+                                required 
+                                min="{{ sistolica_config.min }}" 
+                                max="{{ sistolica_config.max }}" 
+                                step="1">
+                        </div>
+                        <p class="help is-info">Rango: {{ sistolica_config.min }} - {{ sistolica_config.max }} mmHg</p>
+                    </div>
+                </div>
+                
+                <div class="column">
+                    <div class="field">
+                        <label class="label is-size-4 has-text-weight-semibold">Presión Diastólica (Mín)</label>
+                        <div class="control">
+                            <input 
+                                class="input is-large is-warning" 
+                                type="number" 
+                                name="diastolica" 
+                                placeholder="Ej: 80" 
+                                required 
+                                min="{{ diastolica_config.min }}" 
+                                max="{{ diastolica_config.max }}" 
+                                step="1">
+                        </div>
+                        <p class="help is-warning">Rango: {{ diastolica_config.min }} - {{ diastolica_config.max }} mmHg</p>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-primary is-medium">
+                        <span class="icon"><i class="fas fa-save"></i></span>
+                        <span>Guardar Presión</span>
+                    </button>
+                </div>
+                <div class="control">
+                    <a href="{{ url_for('agregar_registro') }}" class="button is-light is-medium">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

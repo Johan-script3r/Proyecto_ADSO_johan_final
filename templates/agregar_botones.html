@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "barra_nav.html" %}
+
+<div class="container">
+    <h1 class="title is-2">Selecciona la Métrica a Registrar</h1>
+    <p class="subtitle is-5">Escoge el dato médico que deseas ingresar a continuación, o calcula tu IMC.</p>
+
+    <h2 class="subtitle is-4 has-text-centered">Cálculo Corporal</h2>
+    <div class="columns is-multiline is-centered">
+        <div class="column is-one-third">
+            <a href="{{ url_for('calcular_imc') }}" class="button is-large is-fullwidth is-danger has-text-weight-bold">
+                <span class="icon"><i class="fas fa-calculator"></i></span>
+                <span>Calcular Índice de Masa Corporal</span>
+            </a>
+        </div>
+    </div>
+    
+    <hr>
+    
+    <h2 class="subtitle is-4 has-text-centered">Registro de Métricas</h2>
+    <div class="columns is-multiline is-centered">
+        {% for metrica_key, metrica_title in metric_options.items() %}
+        <div class="column is-one-third">
+            <a href="{{ url_for('agregar_metrica_individual', metrica=metrica_key) }}" class="button is-large is-fullwidth is-info is-light has-text-weight-bold">
+                {{ metrica_title }}
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="block has-text-centered mt-5">
+        <a href="{{ url_for('index') }}" class="button is-link is-light">Volver al Panel</a>
+    </div>
+</div>
+{% endblock %}

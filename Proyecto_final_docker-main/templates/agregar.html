@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Registro - Sistema de Monitoreo Médico{% endblock %}
+
+{% block content %}
+
+{% include "barra_nav.html" %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plus"></i> Agregar Nuevo Registro Médico
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ritmo_cardiaco" class="form-label">
+                                <i class="fas fa-heartbeat text-danger"></i> Ritmo Cardíaco (ppm)
+                            </label>
+                            <input type="number" class="form-control" id="ritmo_cardiaco" name="ritmo_cardiaco" min="30" max="200" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="presion_sistolica" class="form-label">
+                                <i class="fas fa-tint text-primary"></i> Sistólica
+                            </label>
+                            <input type="number" class="form-control" id="presion_sistolica" name="presion_sistolica" min="70" max="250" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="presion_diastolica" class="form-label">
+                                Diastólica
+                            </label>
+                            <input type="number" class="form-control" id="presion_diastolica" name="presion_diastolica" min="40" max="150" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nivel_azucar" class="form-label">
+                                <i class="fas fa-cube text-warning"></i> Azúcar (mg/dL)
+                            </label>
+                            <input type="number" step="0.1" class="form-control" id="nivel_azucar" name="nivel_azucar" min="50" max="600" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="colesterol" class="form-label">
+                                <i class="fas fa-microscope text-info"></i> Colesterol (mg/dL)
+                            </label>
+                            <input type="number" step="0.1" class="form-control" id="colesterol" name="colesterol" min="100" max="500" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="oxigeno_sangre" class="form-label">
+                                <i class="fas fa-lungs text-success"></i> Oxígeno en Sangre (%)
+                            </label>
+                            <input type="number" step="0.1" class="form-control" id="oxigeno_sangre" name="oxigeno_sangre" min="70" max="100" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="notas" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notas
+                            </label>
+                            <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
