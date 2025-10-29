@@ -13,9 +13,9 @@ from sqlalchemy import func
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mi_secreto')
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://johan:johanc@isladigital.xyz:3311/f58_johan'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://johan:johanc@isladigital.xyz:3311/f58_johan'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///datos_medicos_local.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///datos_medicos_local.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

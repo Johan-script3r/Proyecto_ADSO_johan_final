@@ -287,3 +287,135 @@ body {
     }
 }
 
+/* --- Nuevos estilos para Responsive --- */
+
+/* Formulario Wrapper (Aplica a registro.html, login.html, etc.) */
+.form-responsive-wrapper {
+    max-width: 500px; /* Limita el ancho en pantallas grandes/desktop */
+    margin: 40px auto; /* Centra el formulario */
+    padding: 0 15px; /* Pequeño padding a los lados para no pegar a los bordes */
+}
+
+/* Estilos de inputs de formulario (Asumiendo clases de Bootstrap o similares) */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-control {
+    width: 100%; /* Asegura que inputs y selects ocupen todo el ancho disponible */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Crucial para que el padding no exceda el 100% del width */
+}
+
+/* Media Query para Teléfonos (Ajusta la apariencia en menos de 576px) */
+@media (max-width: 576px) {
+    /* Ajustes generales del contenedor */
+    .container {
+        padding: 0 10px; /* Reduce el padding en el contenedor principal */
+    }
+
+    /* Títulos grandes */
+    .title.is-2 {
+        font-size: 1.8em !important;
+    }
+    .subtitle.is-3 {
+        font-size: 1.4em !important;
+    }
+
+    /* Botones más pequeños si es necesario, aunque 'is-small' ya ayuda */
+    .button {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+    
+    /* El service-item (que contiene el formulario) debe ocupar todo el ancho */
+    .service-item {
+        padding: 20px;
+    }
+}
+
+/* --- Estilos Generales para Formulario (necesarios para registro.html) --- */
+
+/* Wrapper para centrar y limitar el formulario */
+.form-wrapper {
+    max-width: 500px; /* Limita el ancho en desktop */
+    margin: 40px auto; /* Centra el formulario */
+    padding: 0 15px; /* Pequeño padding lateral */
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+/* Estilo para inputs (form-control) */
+.form-control {
+    width: 100%; /* FUNDAMENTAL: Ocupa todo el ancho */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Previene desbordamiento con padding */
+}
+
+/* Botón de ancho completo (w-100) */
+.w-100 {
+    width: 100% !important;
+}
+
+@media (max-width: 768px) {
+    /* 1. Header más compacto */
+    .main-header .container {
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 0; /* Más compacto */
+    }
+
+    .logo {
+        margin-bottom: 10px;
+    }
+
+    /* 2. Navegación apilada */
+    .main-nav ul {
+        margin-top: 10px;
+        flex-direction: column;
+        gap: 5px; /* Reduce espacio entre ítems */
+        width: 100%; /* Ocupa todo el ancho para centrar mejor */
+        padding: 10px 0;
+        border-top: 1px solid var(--secondary-color);
+    }
+
+    .main-nav ul li {
+        margin: 0;
+        padding: 5px 0;
+        text-align: center;
+    }
+
+    /* 3. Títulos y Secciones */
+    .hero-section {
+        padding: 60px 0;
+    }
+
+    .hero-section h2 {
+        font-size: 2.2em; /* Títulos más pequeños */
+    }
+
+    .service-grid, .testimonial-carousel {
+        /* Se adapta automáticamente a 1 columna gracias a tu CSS existente */
+        gap: 20px;
+    }
+
+    /* 4. Pie de página */
+    .main-footer .container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 8px;
+    }
+}

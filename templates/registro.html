@@ -3,81 +3,52 @@
 {% block title %}Registro - Salud & Confianza{% endblock %}
 
 {% block content %}
-<div class="service-item" style="max-width: 500px; margin: 0 auto; padding: 20px;">
-    <h4 style="margin-bottom: 20px;" class="title is-4 has-text-centered">Crear Cuenta</h4>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="notification is-{{ category }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-    <form method="post" action="{{ url_for('registro') }}">
-        
-        <div class="form-group field" style="margin-bottom: 15px;">
-            <label class="label" for="nameUser">Usuario</label>
-            <div class="control">
-                <input type="text" name="nameUser" id="nameUser" class="input is-primary" required>
-            </div>
-        </div>
-
-        <div class="form-group field" style="margin-bottom: 15px;">
-            <label class="label" for="emailUser">Correo Electrónico</label>
-            <div class="control">
-                <input type="email" name="emailUser" id="emailUser" class="input" required>
-            </div>
-        </div>
-
-        <div class="columns">
-            <div class="column">
-                <div class="form-group field" style="margin-bottom: 15px;">
-                    <label class="label" for="edadUser">Edad</label>
-                    <div class="control">
-                        <input type="number" name="edadUser" id="edadUser" class="input" min="1" max="120">
-                    </div>
+<div class="container">
+    <div class="form-responsive-wrapper">
+        <div class="service-item">
+            <h4 style="margin-bottom: 20px;">Crear Cuenta</h4>
+            <form method="post" action="{{ url_for('registro') }}">
+                
+                <div class="form-group">
+                    <label for="nameUser">Usuario</label>
+                    <input type="text" name="nameUser" id="nameUser" class="form-control" required>
                 </div>
-            </div>
-            <div class="column">
-                <div class="form-group field" style="margin-bottom: 15px;">
-                    <label class="label" for="telefonoUser">Teléfono</label>
-                    <div class="control">
-                        <input type="tel" name="telefonoUser" id="telefonoUser" class="input">
-                    </div>
+                
+                <div class="form-group">
+                    <label for="emailUser">Correo Electrónico</label>
+                    <input type="email" name="emailUser" id="emailUser" class="form-control" required>
                 </div>
-            </div>
-        </div>
 
-        <div class="form-group field" style="margin-bottom: 15px;">
-            <label class="label" for="sexoUser">Sexo</label>
-            <div class="control">
-                <div class="select is-fullwidth">
-                    <select name="sexoUser" id="sexoUser">
-                        <option value="">Selecciona</option>
+                <div class="form-group">
+                    <label for="passwordUser">Contraseña</label>
+                    <input type="password" name="passwordUser" id="passwordUser" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edadUser">Edad</label>
+                    <input type="number" name="edadUser" id="edadUser" class="form-control" min="1" max="120" placeholder="Opcional">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sexoUser">Sexo</label>
+                    <select name="sexoUser" id="sexoUser" class="form-control">
+                        <option value="">Seleccionar (Opcional)</option>
                         <option value="masculino">Masculino</option>
                         <option value="femenino">Femenino</option>
                         <option value="otro">Otro</option>
                     </select>
                 </div>
-            </div>
+                
+                <div class="form-group">
+                    <label for="telefonoUser">Teléfono</label>
+                    <input type="tel" name="telefonoUser" id="telefonoUser" class="form-control" placeholder="Opcional">
+                </div>
+                
+                <button type="submit" class="button w-100 mt-4">Registrarme</button>
+            </form>
+            <br>
+            <a href="{{ url_for('login') }}">Volver al inicio de Sesión</a>
         </div>
-        
-        <div class="form-group field" style="margin-bottom: 20px;">
-            <label class="label" for="passwordUser">Contraseña</label>
-            <div class="control">
-                <input type="password" name="passwordUser" id="passwordUser" class="input" required>
-            </div>
-        </div>
-
-        <button type="submit" class="button is-primary is-fullwidth">
-            <span class="icon"><i class="fas fa-user-plus"></i></span>
-            <span>Registrarme</span>
-        </button>
-    </form>
-    <br>
-    <div class="has-text-centered">
-        <a href="{{ url_for('login') }}">Volver al Inicio de Sesión</a>
     </div>
 </div>
 {% endblock %}
