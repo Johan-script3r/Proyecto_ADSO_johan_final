@@ -101,6 +101,8 @@ body {
     border-radius: 30px;
     font-weight: 700;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    border: none; /* Asegura que no haya bordes por defecto */
+    cursor: pointer;
 }
 /*botn pequeño*/
 .button_2{
@@ -112,6 +114,8 @@ body {
     border-radius: 20px;
     font-weight: 600;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    border: 1px solid var(--text-color-dark);
+    cursor: pointer;
 }
 .button:hover {
     background-color: #D67F70; /* Slightly darker accent */
@@ -137,14 +141,24 @@ body {
     gap: 30px;
 }
 
+/* Enlace Wrapper para que el div.service-item sea clickeable */
+.service-link {
+    text-decoration: none; 
+    color: inherit;     
+    display: block;    /* CRUCIAL: Necesita ser un bloque para la grilla */
+    height: 100%;
+}
+
 .service-item {
     background-color: var(--white-color);
     padding: 40px;
     border-radius: 15px;
     box-shadow: var(--box-shadow);
     transition: transform 0.3s ease;
+    height: 100%; /* Ocupa toda la altura del service-link */
 }
 
+.service-link:hover .service-item,
 .service-item:hover {
     transform: translateY(-10px);
 }
@@ -182,7 +196,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 30px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex-wrap: wrap; 
 }
 
 .testimonial-item {
@@ -193,7 +207,7 @@ body {
     max-width: 350px;
     text-align: left;
     box-shadow: var(--box-shadow);
-    flex-shrink: 0; /* Prevent shrinking when space is tight */
+    flex-shrink: 0; 
 }
 
 .testimonial-item p {
@@ -247,103 +261,78 @@ body {
     color: var(--primary-color);
 }
 
-@media (max-width: 768px) {
-    .main-header .container {
-        flex-direction: column;
-        text-align: center;
-    }
+/* --- ESTILOS DE CONSEJOS (Grid y Flexbox para evitar desorden) --- */
 
-    .main-nav ul {
-        margin-top: 20px;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .main-nav ul li {
-        margin: 0;
-    }
-
-    .hero-section h2 {
-        font-size: 2.5em;
-    }
-
-    .hero-section p {
-        font-size: 1em;
-    }
-
-    .service-grid, .testimonial-carousel {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .main-footer .container {
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .footer-links {
-        flex-direction: column;
-        gap: 10px;
-    }
+.consejos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
+    gap: 30px; 
+    margin-top: 30px;
 }
 
-/* --- Nuevos estilos para Responsive --- */
-
-/* Formulario Wrapper (Aplica a registro.html, login.html, etc.) */
-.form-responsive-wrapper {
-    max-width: 500px; /* Limita el ancho en pantallas grandes/desktop */
-    margin: 40px auto; /* Centra el formulario */
-    padding: 0 15px; /* Pequeño padding a los lados para no pegar a los bordes */
+/* El Wrapper del enlace debe ser un bloque y ocupar toda la altura */
+.consejo-link-wrapper {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%; 
 }
 
-/* Estilos de inputs de formulario (Asumiendo clases de Bootstrap o similares) */
-.form-group {
-    margin-bottom: 15px;
-    text-align: left;
+.consejo-link-wrapper:hover .consejo-card {
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.form-control {
-    width: 100%; /* Asegura que inputs y selects ocupen todo el ancho disponible */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box; /* Crucial para que el padding no exceda el 100% del width */
+/* Tarjeta principal: Define el contenedor Flex vertical */
+.consejo-card {
+    background: var(--white-color);
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    display: flex;             /* 1. Habilita Flexbox */
+    flex-direction: column;    /* 2. Organiza la imagen y el cuerpo verticalmente */
+    height: 100%;              /* 3. Ocupa la altura completa de la grilla */
+    transition: transform 0.2s;
 }
 
-/* Media Query para Teléfonos (Ajusta la apariencia en menos de 576px) */
-@media (max-width: 576px) {
-    /* Ajustes generales del contenedor */
-    .container {
-        padding: 0 10px; /* Reduce el padding en el contenedor principal */
-    }
-
-    /* Títulos grandes */
-    .title.is-2 {
-        font-size: 1.8em !important;
-    }
-    .subtitle.is-3 {
-        font-size: 1.4em !important;
-    }
-
-    /* Botones más pequeños si es necesario, aunque 'is-small' ya ayuda */
-    .button {
-        padding: 10px 20px;
-        font-size: 0.9em;
-    }
-    
-    /* El service-item (que contiene el formulario) debe ocupar todo el ancho */
-    .service-item {
-        padding: 20px;
-    }
+.consejo-img {
+    width: 150%;
+    height: 400px;
+    object-fit: cover;
+    flex-shrink: 0; /* Previene que la imagen se reduzca */
 }
 
-/* --- Estilos Generales para Formulario (necesarios para registro.html) --- */
+/* Cuerpo del consejo: Permite que ocupe el espacio restante y organiza sus elementos */
+.consejo-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;              /* 4. Permite que el cuerpo ocupe todo el espacio restante bajo la imagen */
+}
 
-/* Wrapper para centrar y limitar el formulario */
+/* El contenido (párrafo) debe empujar el bloque de botones hacia abajo */
+.consejo-body p {
+    flex-grow: 1;              /* 5. Fuerza el estiramiento del texto */
+    margin-bottom: 15px; 
+}
+
+/* Contenedor de botones (visible solo para admin): Lo empuja al final */
+.actions {
+    margin-top: auto;          /* 6. Empuja el elemento al final del contenedor flex */
+    padding-top: 10px; 
+    border-top: 1px solid var(--secondary-color); 
+    text-align: right; 
+    display: flex;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    gap: 10px; /* Espacio entre botones */
+}
+
+/* --- ESTILOS GENERALES DE FORMULARIO --- */
+
 .form-wrapper {
-    max-width: 500px; /* Limita el ancho en desktop */
-    margin: 40px auto; /* Centra el formulario */
-    padding: 0 15px; /* Pequeño padding lateral */
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 0 15px;
 }
 
 .form-group {
@@ -351,71 +340,144 @@ body {
     text-align: left;
 }
 
-/* Estilo para inputs (form-control) */
 .form-control {
-    width: 100%; /* FUNDAMENTAL: Ocupa todo el ancho */
+    width: 100%; 
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    box-sizing: border-box; /* Previene desbordamiento con padding */
+    box-sizing: border-box; 
 }
 
-/* Botón de ancho completo (w-100) */
 .w-100 {
     width: 100% !important;
 }
 
+/* --- ESTILOS DE BOTONES DE MÉTRICAS --- */
+.metric-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background-color: var(--white-color);
+    padding: 20px 25px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+    text-decoration: none;
+    color: var(--text-color-dark);
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: 1px solid var(--secondary-color);
+}
+.metric-button:hover {
+    background-color: var(--secondary-color);
+}
+.metric-button.accent {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    text-align: center;
+}
+.metric-button.accent:hover {
+    background-color: var(--accent-color);
+}
+
+
+/* --- IMPLEMENTACIÓN DEL BOTÓN HAMBURGUESA --- */
+
+.menu-toggle {
+    display: none; 
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    color: var(--text-color-dark);
+    cursor: pointer;
+    padding: 0;
+}
+
+/* --- MEDIA QUERIES (RESPONSIVE) --- */
+
 @media (max-width: 768px) {
-    /* 1. Header más compacto */
+    /* Muestra el botón de hamburguesa */
+    .menu-toggle {
+        display: block; 
+    }
+    
+    /* Header: Alinea logo y toggle */
     .main-header .container {
-        flex-direction: column;
+        flex-direction: row; 
+        justify-content: space-between; 
         align-items: center;
-        padding-bottom: 0; /* Más compacto */
+        padding-bottom: 20px;
     }
-
-    .logo {
-        margin-bottom: 10px;
-    }
-
-    /* 2. Navegación apilada */
-    .main-nav ul {
-        margin-top: 10px;
-        flex-direction: column;
-        gap: 5px; /* Reduce espacio entre ítems */
-        width: 100%; /* Ocupa todo el ancho para centrar mejor */
-        padding: 10px 0;
+    
+    /* Oculta la navegación y la posiciona */
+    .main-nav {
+        position: absolute;
+        top: 60px; /* Ajusta a la altura de tu header */
+        right: 0;
+        width: 100%;
+        background-color: var(--white-color);
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        
+        /* OCULTAR MENÚ por defecto (usando max-height para transición CSS) */
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
         border-top: 1px solid var(--secondary-color);
+    }
+    
+    /* Estilos de la lista al estar desplegado */
+    .main-nav ul {
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
     }
 
     .main-nav ul li {
         margin: 0;
-        padding: 5px 0;
-        text-align: center;
+        border-bottom: 1px solid var(--secondary-color);
     }
 
-    /* 3. Títulos y Secciones */
-    .hero-section {
-        padding: 60px 0;
+    .main-nav ul li:last-child {
+        border-bottom: none;
     }
 
-    .hero-section h2 {
-        font-size: 2.2em; /* Títulos más pequeños */
+    .main-nav ul li a {
+        display: block; 
+        padding: 15px 20px;
+        text-align: left;
     }
 
-    .service-grid, .testimonial-carousel {
-        /* Se adapta automáticamente a 1 columna gracias a tu CSS existente */
+    /* ESTADO ACTIVO (VISIBLE) - Muestra el menú */
+    .main-nav.active {
+        max-height: 500px; 
+    }
+    
+    /* Ajustes de Grillas a 1 columna */
+    .service-grid, 
+    .consejos-grid { /* Ajuste clave para Consejos en móvil */
+        grid-template-columns: 1fr;
         gap: 20px;
     }
-
-    /* 4. Pie de página */
+    
+    /* Footer */
     .main-footer .container {
         flex-direction: column;
         gap: 15px;
-        text-align: center;
     }
-
     .footer-links {
         flex-direction: column;
         gap: 8px;
+    }
+
+    /* Títulos */
+    .hero-section h2 {
+        font-size: 2.5em;
+    }
+    .services-section, .testimonials-section {
+        padding: 50px 0;
     }
 }

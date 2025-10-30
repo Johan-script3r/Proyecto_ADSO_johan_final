@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Consejo - {{ consejo.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title is-2">✏️ Editar Consejo: {{ consejo.titulo }}</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% endif %}
+    {% endwith %}
+
+    <div class="form-wrapper">
+        <form method="POST" action="{{ url_for('editar_consejo', consejo_id=consejo.id) }}" enctype="multipart/form-data">
+            
+            <div class="form-group">
+                <label for="titulo">Título del Consejo</label>
+                <input type="text" name="titulo" id="titulo" class="form-control" value="{{ consejo.titulo }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contenido">Contenido Detallado</label>
+                <textarea name="contenido" id="contenido" class="form-control" rows="8" required>{{ consejo.contenido }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="tema">Tema</label>
+                <select name="tema" id="tema" class="form-control" required>
+                    {% for tema in temas_predefinidos %}
+                        <option value="{{ tema }}" {% if tema == consejo.tema %}selected{% endif %}>
+                            {{ tema }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="imagen">Imagen Actual</label>
+                {% if consejo.imagen_url %}
+                    <img src="{{ consejo.imagen_url }}" alt="Imagen actual" style="max-width: 150px; display: block; margin-bottom: 10px; border-radius: 5px;">
+                    <p class="help">Sube un archivo nuevo para reemplazar la imagen actual.</p>
+                {% else %}
+                    <p class="help">No hay imagen subida para este consejo.</p>
+                {% endif %}
+                
+                <input type="file" name="imagen" id="imagen" accept="image/*" class="form-control">
+            </div>
+            
+            <button type="submit" class="button is-primary w-100 mt-4">Guardar Cambios</button>
+        </form>
+    </div>
+    
+    <div class="mt-4 has-text-centered">
+        <a href="{{ url_for('ver_consejo', consejo_id=consejo.id) }}" class="button is-link is-light">Cancelar y Volver</a>
+    </div>
+</div>
+{% endblock %}

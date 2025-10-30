@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ consejo.titulo }} - Consejos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="consejo-detalle-box">
+        
+        <a href="{{ url_for('consejos') }}" class="back-link">&leftarrow; Volver a todos los consejos</a>
+        
+        <span class="tag is-info detalle-tag">{{ consejo.tema }}</span>
+
+        <h1 class="detalle-title">{{ consejo.titulo }}</h1>
+        
+        <p class="detalle-meta">
+            Publicado el: {{ consejo.fecha.strftime('%d de %B de %Y') }}
+            {% if consejo.admin %}
+            por {{ consejo.admin.nombre }} (Admin)
+            {% endif %}
+        </p>
+        
+        {% if consejo.imagen_url %}
+            <div class="detalle-img-container">
+                <img src="{{ consejo.imagen_url }}" alt="{{ consejo.titulo }}" class="detalle-img">
+            </div>
+        {% endif %}
+
+        <div class="detalle-contenido">
+            <p>{{ consejo.contenido }}</p>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .consejo-detalle-box {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--white-color);
+        border-radius: 12px;
+        box-shadow: var(--box-shadow);
+    }
+    .detalle-title {
+        font-size: 2.5em;
+        color: var(--text-color-dark);
+        margin-top: 10px;
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+    .detalle-tag {
+        font-size: 0.9em;
+        font-weight: 600;
+        padding: 5px 10px;
+        border-radius: 5px;
+        background-color: var(--accent-color); /* Usamos el color de acento para la etiqueta */
+        color: var(--white-color);
+        text-transform: uppercase;
+    }
+    .detalle-meta {
+        color: var(--text-color-light);
+        font-size: 0.9em;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--secondary-color);
+        padding-bottom: 10px;
+    }
+    .detalle-img-container {
+        margin: 20px 0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .detalle-img {
+        width: 100%;
+        height: auto;
+        max-height: 450px;
+        object-fit: cover;
+    }
+    .detalle-contenido p {
+        font-size: 1.1em;
+        line-height: 1.8;
+        color: var(--text-color-dark);
+        white-space: pre-wrap; /* Mantiene saltos de línea y espacios del texto */
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        text-decoration: none;
+        color: var(--accent-color);
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+    .back-link:hover {
+        color: var(--text-color-dark);
+    }
+</style>
+{% endblock %}

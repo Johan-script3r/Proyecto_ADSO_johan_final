@@ -50,5 +50,17 @@
     </main>
     {% include "pie_pagina.html"%}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButton = document.querySelector('.menu-toggle');
+        const navMenu = document.querySelector('.main-nav');
+
+        if (toggleButton) {
+            toggleButton.addEventListener('click', function() {
+                navMenu.classList.toggle('active');
+            });
+        }
+    });
+</script>
 </body>
 </html>

@@ -28,25 +28,32 @@
         </section>
         
         <section id="servicios" class="services-section">
-            <div class="container">
-                <h3>Lo que Ofrecemos</h3>
-                <div class="service-grid">
+            <div class="service-grid">
+    
+                <a href="{{ url_for('agregar_registro') }}" class="service-link">
                     <div class="service-item">
-                        <img src="/static/jpg/icon_search.png" alt="Icono de Búsqueda">
-                        <h4></h4>
-                        <p></p>
+                        <img src="/static/jpg/6361827.png" alt="Icono de Búsqueda">
+                        <h4>Registros Medicos</h4>
+                        <p>Lugar donde podras registrar los datos y medidas medicas</p>
                     </div>
+                </a>
+                
+                <a href="{{ url_for('historial') }}" class="service-link">
                     <div class="service-item">
-                        <img src="/static/jpg/icon_review.png" alt="Icono de Reseña">
-                        <h4></h4>
-                        <p></p>
+                        <img src="/static/jpg/1787081.png" alt="Icono de Reseña">
+                        <h4>Historial</h4>
+                        <p>Donde puedes ver todos los datos que has almacenado</p>
                     </div>
+                </a>
+                
+                <a href="{{ url_for('consejos') }}" class="service-link">
                     <div class="service-item">
-                        <img src="/static/jpg/icon_share.png" alt="Icono de Compartir">
-                        <h4></h4>
-                        <p></p>
+                        <img src="/static/jpg/13102137.png" alt="Icono de Compartir">
+                        <h4>Consejos</h4>
+                        <p>Un monton de curiosidades y consejos para mejorar tu salud</p>
                     </div>
-                </div>
+                </a>
+                
             </div>
         </section>
     {% include "pie_pagina.html"%}

@@ -9,13 +9,14 @@ from urllib.parse import quote_plus
 from functools import wraps
 from flask import abort
 from sqlalchemy import func
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mi_secreto')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://johan:johanc@isladigital.xyz:3311/f58_johan'
+#app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://johan:johanc@isladigital.xyz:3311/f58_johan'
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///datos_medicos_local.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///datos_medicos_local.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -27,6 +28,22 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_size': 10, 
     'max_overflow': 20,
 }
+
+def rol_requerido(rol):
+    # La función externa recibe el argumento ('admin')
+    def decorator(f):
+        # La función del medio recibe la función a decorar (la ruta de Flask)
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # Lógica de verificación
+            if 'usuario_id' not in session or session.get('rol') != rol:
+                flash("Acceso denegado. Se requiere el rol de " + rol, "error")
+                return redirect(url_for('login'))
+            return f(*args, **kwargs)
+        # ESTO ES CRÍTICO: Debe devolver la función envuelta
+        return decorated_function
+    # ESTO TAMBIÉN ES CRÍTICO: Debe devolver la función interna 'decorator'
+    return decorator
 
 db = SQLAlchemy(app)
 
@@ -511,14 +528,19 @@ def login():
         nombre = request.form.get('nameUser', '').strip()
         password = request.form.get('passwordUser', '')
 
-        print(f"Intento de login con usuario: '{nombre}'")
+        # ... (código de print omitido) ...
         usuario = Usuario.query.filter_by(nombre=nombre).first()
 
         if usuario:
-            print(f"Usuario encontrado en la base de datos: {usuario.nombre}")
+            # ... (código de print omitido) ...
             if usuario.check_password(password):
                 print("Contraseña correcta. Iniciando sesión...")
+                
+                # --- AÑADE ESTA LÍNEA CRUCIAL ---
                 session['usuario_id'] = usuario.id
+                session['rol'] = usuario.rol  # <--- GUARDAR EL ROL EN LA SESIÓN
+                # --------------------------------
+                
                 flash(f"Bienvenido, {usuario.nombre}", "success")
                 
                 if usuario.rol == 'admin':
@@ -534,23 +556,22 @@ def login():
 
     return render_template("login_salud.html")
 
-def rol_requerido(rol):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if 'usuario_id' not in session:
-                flash("Debes iniciar sesión para acceder.", "error")
-                return redirect(url_for('login'))
-            
-            usuario = Usuario.query.get(session['usuario_id'])
-            if not usuario or usuario.rol != rol:
-                flash("No tienes permisos para acceder a esta página.", "error")
-                return redirect(url_for('inicio'))
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
+#def rol_requerido(rol):
+ #      @wraps(f)
+#      def decorated_function(*args, **kwargs):
+ #           if 'usuario_id' not in session:
+  #              flash("Debes iniciar sesión para acceder.", "error")
+   #             return redirect(url_for('login'))
+    #        
+     #       usuario = Usuario.query.get(session['usuario_id'])
+      #      if not usuario or usuario.rol != rol:
+ #               flash("No tienes permisos para acceder a esta página.", "error")
+#                return redirect(url_for('inicio'))
+ #           return f(*args, **kwargs)
+#        return decorated_function
+ #   return decorator
 
-
+# Coloca esta función antes de cualquier ruta que la use (al inicio de tu app.py)
 @app.route('/admin/dashboard', methods=['GET'])
 @rol_requerido('admin')
 def admin_dashboard():
@@ -742,6 +763,192 @@ def editar_registro(modelo_nombre, registro_id):
                                    modelo_nombre=modelo_nombre,
                                    metric_title=metric_title,
                                    config=config)
+
+UPLOAD_FOLDER = 'static/uploads/consejos'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+class Consejo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(100), nullable=False)
+    contenido = db.Column(db.Text, nullable=False)
+    tema = db.Column(db.String(50), nullable=False) # Ej: Nutrición, Ejercicio, Sueño
+    fecha = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    imagen_url = db.Column(db.String(255)) # Ruta del archivo de imagen
+    
+    usuario_admin_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    admin = db.relationship('Usuario', backref='consejos')
+
+    def __repr__(self):
+        return f'<Consejo {self.titulo}>'
+
+@app.route('/consejos', methods=['GET'])
+def consejos():
+    # Obtiene el término de búsqueda y el filtro de tema de la URL
+    query = request.args.get('q', '').strip()
+    tema_filtro = request.args.get('tema', '').strip()
+    
+    consejos_query = Consejo.query.order_by(Consejo.fecha.desc())
+    
+    # Aplicar filtro de búsqueda (por título o contenido)
+    if query:
+        consejos_query = consejos_query.filter(
+            (Consejo.titulo.ilike(f'%{query}%')) | 
+            (Consejo.contenido.ilike(f'%{query}%'))
+        )
+        
+    # Aplicar filtro de tema
+    if tema_filtro and tema_filtro != 'todos':
+        consejos_query = consejos_query.filter_by(tema=tema_filtro)
+
+    consejos_lista = consejos_query.all()
+    
+    # Obtener todos los temas únicos para el menú desplegable
+    temas_unicos = db.session.query(Consejo.tema).distinct().all()
+    temas_unicos = [t[0] for t in temas_unicos]
+
+    return render_template('consejos.html', 
+                           consejos=consejos_lista,
+                           temas_unicos=temas_unicos,
+                           query=query,
+                           tema_filtro=tema_filtro)
+
+
+@app.route('/admin/agregar_consejo', methods=['GET', 'POST'])
+@rol_requerido('admin')
+def agregar_consejo():
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        contenido = request.form['contenido']
+        tema = request.form['tema']
+        imagen = request.files.get('imagen')
+        imagen_url = None
+        
+        if imagen and allowed_file(imagen.filename):
+            try:
+                # 1. Asegurar nombre de archivo
+                filename = secure_filename(imagen.filename)
+                
+                # 2. Guardar el archivo en la carpeta de uploads
+                path_to_save = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                imagen.save(path_to_save)
+                
+                # 3. Guardar la URL relativa para la DB
+                imagen_url = url_for('static', filename=f'uploads/consejos/{filename}')
+                
+            except Exception as e:
+                flash(f'Error al subir la imagen: {e}', 'error')
+                return redirect(url_for('agregar_consejo'))
+
+        nuevo_consejo = Consejo(
+            titulo=titulo,
+            contenido=contenido,
+            tema=tema,
+            imagen_url=imagen_url,
+            usuario_admin_id=session.get('usuario_id') 
+        )
+        
+        try:
+            db.session.add(nuevo_consejo)
+            db.session.commit()
+            flash(f'Consejo "{titulo}" agregado exitosamente!', 'success')
+            return redirect(url_for('consejos'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al guardar el consejo: {str(e)}', 'error')
+            
+   
+    temas_predefinidos = ['Nutrición', 'Ejercicio', 'Sueño', 'Estrés', 'Higiene','Diabetes','General']
+    
+    return render_template('agregar_consejo.html', temas_predefinidos=temas_predefinidos)
+    
+
+
+@app.route('/consejo/<int:consejo_id>')
+def ver_consejo(consejo_id):
+    """Muestra la página de detalles de un consejo específico."""
+    
+    consejo = Consejo.query.get_or_404(consejo_id)
+    return render_template('consejo_detalle.html', consejo=consejo)
+
+@app.route('/admin/editar_consejo/<int:consejo_id>', methods=['GET', 'POST'])
+@rol_requerido('admin')
+def editar_consejo(consejo_id):
+    consejo = Consejo.query.get_or_404(consejo_id)
+    temas_predefinidos = ['Nutrición', 'Ejercicio', 'Sueño', 'Estrés','Diabetes', 'Higiene', 'General']
+
+    if request.method == 'POST':
+        consejo.titulo = request.form['titulo']
+        consejo.contenido = request.form['contenido']
+        consejo.tema = request.form['tema']
+        imagen = request.files.get('imagen')
+        
+        # Lógica para manejar la nueva imagen
+        if imagen and allowed_file(imagen.filename):
+            try:
+                # Opcional: Eliminar imagen antigua si existe
+                if consejo.imagen_url:
+                    # Convierte la URL a ruta de sistema de archivos
+                    old_filename = consejo.imagen_url.split('/')[-1]
+                    old_path = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+                        
+                # 1. Guardar nueva imagen
+                filename = secure_filename(imagen.filename)
+                path_to_save = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                imagen.save(path_to_save)
+                
+                # 2. Actualizar la URL en la DB
+                consejo.imagen_url = url_for('static', filename=f'uploads/consejos/{filename}')
+                
+            except Exception as e:
+                flash(f'Error al subir la nueva imagen: {e}', 'error')
+                return redirect(url_for('editar_consejo', consejo_id=consejo.id))
+
+        try:
+            db.session.commit()
+            flash(f'Consejo "{consejo.titulo}" actualizado exitosamente!', 'success')
+            return redirect(url_for('ver_consejo', consejo_id=consejo.id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al guardar la edición: {str(e)}', 'error')
+            
+    return render_template('editar_consejo.html', 
+                           consejo=consejo, 
+                           temas_predefinidos=temas_predefinidos)
+    
+@app.route('/admin/eliminar_consejo/<int:consejo_id>', methods=['POST'])
+@rol_requerido('admin')
+def eliminar_consejo(consejo_id):
+    consejo = Consejo.query.get_or_404(consejo_id)
+    titulo_consejo = consejo.titulo
+    
+    try:
+        # Opcional: Eliminar la imagen del servidor antes de borrar el registro
+        if consejo.imagen_url:
+            # Convierte la URL a ruta de sistema de archivos
+            filename = consejo.imagen_url.split('/')[-1]
+            path_to_delete = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(path_to_delete):
+                os.remove(path_to_delete)
+        
+        db.session.delete(consejo)
+        db.session.commit()
+        flash(f'El consejo "{titulo_consejo}" ha sido eliminado exitosamente.', 'success')
+        return redirect(url_for('consejos'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar el consejo: {str(e)}', 'error')
+        return redirect(url_for('consejos'))
     
 if __name__ == '__main__':
     with app.app_context():

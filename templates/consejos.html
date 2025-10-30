@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "barra_nav.html" %}
+<div class="container">
+    <h1 class="title is-2">Consejos de Salud</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+             
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="box mb-4">
+        <form method="GET" action="{{ url_for('consejos') }}">
+            <div class="row">
+                <div class="col-md-7 col-sm-12 form-group">
+                    <input type="text" 
+                           name="q" 
+                           class="form-control" 
+                           placeholder="Buscar por título o contenido..." 
+                           value="{{ query }}"
+                           aria-label="Término de búsqueda">
+                </div>
+
+                <div class="col-md-3 col-sm-12 form-group">
+                    <select name="tema" class="form-control" aria-label="Filtrar por tema">
+                        <option value="todos">Todos los Temas</option>
+                        {% for tema in temas_unicos %}
+                            <option value="{{ tema }}" {% if tema == tema_filtro %}selected{% endif %}>
+                                {{ tema }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2 col-sm-12 form-group d-grid">
+                    <button type="submit" class="button is-primary w-100">Buscar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+<br>
+<br>
+    {% if consejos %}
+        <div class="consejos-grid">
+            {% for consejo in consejos %}
+                <a href="{{ url_for('ver_consejo', consejo_id=consejo.id) }}" class="consejo-link-wrapper"><div class="consejo-card">
+                    {% if consejo.imagen_url %}
+                        <img src="{{ consejo.imagen_url }}" alt="{{ consejo.titulo }}" class="consejo-img">
+                    {% endif %}
+                    <div class="consejo-body">
+                        <span class="tag is-info">{{ consejo.tema }}</span>
+                        <h3 class="consejo-title">{{ consejo.titulo }}</h3>
+                        <p>{{ consejo.contenido | truncate(150, True) }}</p>
+                        <small>Publicado: {{ consejo.fecha.strftime('%d %b, %Y') }}</small>
+                        </div>
+                </div>
+            <div class="consejo-body">
+                {% if session.get('rol') == 'admin' %}
+                <div class="actions mt-3">
+                    <a href="{{ url_for('editar_consejo', consejo_id=consejo.id) }}" class="button is-info is-small">
+                        Editar
+                    </a>
+
+                    <form method="POST" action="{{ url_for('eliminar_consejo', consejo_id=consejo.id) }}" style="display:inline-block;">
+                        <button type="submit" class="button is-danger is-small" onclick="return confirm('¿Estás seguro de que quieres eliminar permanentemente este consejo? Esto también borrará la imagen asociada.')">
+                            Eliminar
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            </a>
+            {% endfor %}
+            
+        </div>
+    {% else %}
+        <p class="notification is-warning">No se encontraron consejos que coincidan con los criterios de búsqueda.</p>
+    {% endif %}
+<br>
+<br>
+    {% if session.get('rol') == 'admin' %}
+    <div class="mt-5">
+        <a href="{{ url_for('agregar_consejo') }}" class="button is-success">Añadir Nuevo Consejo</a>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+    .consejos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    .consejo-card {
+        background: var(--white-color);
+        border-radius: 10px;
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s;
+    }
+    .consejo-card:hover {
+        transform: translateY(-5px);
+    }
+    .consejo-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .consejo-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .consejo-title {
+        font-size: 1.4em;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color: var(--accent-color);
+    }
+    .tag { /* Reemplaza esto con tu clase de etiqueta si tienes Bulma */
+        align-self: flex-start;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.8em;
+    }
+
+    /* Diseño Responsive para el formulario de búsqueda */
+    @media (max-width: 768px) {
+        .row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .col-md-7, .col-md-3, .col-md-2 {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

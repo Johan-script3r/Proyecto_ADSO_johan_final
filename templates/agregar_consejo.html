@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title is-2">Agregar Nuevo Consejo de Salud</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification is-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="form-wrapper">
+        <form method="POST" action="{{ url_for('agregar_consejo') }}" enctype="multipart/form-data">
+            
+            <div class="form-group">
+                <label for="titulo">Título del Consejo</label>
+                <input type="text" name="titulo" id="titulo" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contenido">Contenido Detallado</label>
+                <textarea name="contenido" id="contenido" class="form-control" rows="8" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="tema">Tema</label>
+                <select name="tema" id="tema" class="form-control" required>
+                    {% for tema in temas_predefinidos %}
+                        <option value="{{ tema }}">{{ tema }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="imagen">Imagen (Opcional)</label>
+                <input type="file" name="imagen" id="imagen" accept="image/*" class="form-control">
+            </div>
+            
+            <button type="submit" class="button w-100 mt-4">Guardar Consejo</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
