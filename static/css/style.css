@@ -14,11 +14,87 @@
     box-sizing: border-box;
 }
 
+/* Busca el estilo de 'body' y modifícalo */
+/* 1. Asegura que el HTML y el BODY se extiendan completamente */
+html {
+    /* Esto es crucial para un fondo que cubra todo */
+    height: 100%; 
+    background-color: var(--secondary-color); /* Color de base */
+}
+
 body {
     font-family: 'Open Sans', sans-serif;
     line-height: 1.6;
     color: var(--text-color-dark);
-    background-color: var(--secondary-color);
+    
+    /* ELIMINAMOS el color plano/degradado de fondo de body */
+    background: none; 
+    
+    /* Aseguramos que el contenido esté por encima del fondo */
+    position: relative; 
+    z-index: 1; 
+    
+    /* El min-height: 100vh ayuda a que el fondo cubra la pantalla incluso con poco contenido */
+    min-height: 100vh; 
+}
+
+
+/* --- NUEVO PSEUDO-ELEMENTO: EL FONDO FIJO (IMAGEN) --- */
+body::before {
+    content: '';
+    /* CLAVE 1: Usamos 'fixed' para que la capa se quede estática en la ventana */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    background-image: url('../jpg/healthcare-heart-beat-4rg8v86gvhzdl30y.jpg'); 
+    background-repeat: no-repeat; 
+    background-position: center center;
+    background-size: cover; 
+    
+    /* CLAVE 2: Esta propiedad asegura el efecto Parallax/Estático */
+    background-attachment: fixed; 
+    
+    /* CLAVE 3: Esta capa controla la imagen, no la opacidad del contenido */
+    /* Le damos una opacidad MUY BAJA (0.1 = 10% visible) */
+    opacity: 0.3; 
+    
+    /* Enviamos la capa al fondo absoluto */
+    z-index: -2; 
+}
+
+/* --- NUEVO PSEUDO-ELEMENTO: EL OVERLAY BLANCO/SUAVE (OPCIONAL) --- */
+/* Esta capa puede usarse para hacer la imagen AÚN MÁS sutil o para aplicar tu degradado */
+body::after {
+    content: '';
+    position: fixed; /* Fija la capa al viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* Usa el degradado que te gustaba, o un color sólido semi-transparente */
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 240, 240, 0.5) 100%); 
+    
+    /* La opacidad final se controla aquí si usas un color sólido. Si usas RGBA, no la necesitas */
+    /* opacity: 0.8; */
+    
+    z-index: -1; /* Queda entre el contenido y la imagen de fondo */
+}
+
+/* --- Degradado para el hero-section (existente) --- */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white-color);
+    padding: 100px 0;
+    background-attachment: fixed;
+    text-align: center;
+    border-radius: 0 0 50px 50px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); 
+    position: relative; /* Asegura que la sombra y el z-index funcionen correctamente */
+    z-index: 2; /* Para que quede por encima del fondo general */
 }
 
 .container {
@@ -70,14 +146,15 @@ body {
 .main-nav ul li a:hover {
     color: var(--primary-color);
 }
-
-/* Hero Section */
 .hero-section {
-    background-color: var(--primary-color);
+    
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
     color: var(--white-color);
     padding: 100px 0;
     text-align: center;
-    border-radius: 0 0 50px 50px; /* Soft rounded bottom */
+    border-radius: 0 0 50px 50px;
+    /* Aplica una sombra sutil para levantarlo del fondo */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); 
 }
 
 .hero-section h2 {
@@ -480,4 +557,146 @@ body {
     .services-section, .testimonials-section {
         padding: 50px 0;
     }
+}
+/* --- IMPLEMENTACIÓN DEL BOTÓN HAMBURGUESA --- */
+
+.menu-toggle {
+    display: none; 
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    color: var(--text-color-dark);
+    cursor: pointer;
+    padding: 0;
+}
+
+/* --- MEDIA QUERIES (RESPONSIVE) --- */
+
+@media (max-width: 768px) {
+    /* Muestra el botón de hamburguesa */
+    .menu-toggle {
+        display: block; 
+    }
+    
+    /* Header: Alinea logo y toggle */
+    .main-header .container {
+        flex-direction: row; /* Vuelve a línea horizontal */
+        justify-content: space-between; 
+        align-items: center;
+        padding-bottom: 0; /* Elimina el padding de separación */
+    }
+    
+    /* Oculta la navegación y la posiciona */
+    .main-nav {
+        position: absolute;
+        top: 60px; /* Posiciona debajo del header */
+        right: 0;
+        width: 100%;
+        background-color: var(--white-color);
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        
+        /* OCULTAR MENÚ por defecto */
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+        border-top: 1px solid var(--secondary-color);
+    }
+    
+    /* Estilos de la lista al estar desplegado */
+    .main-nav ul {
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+    }
+
+    .main-nav ul li {
+        margin: 0;
+        border-bottom: 1px solid var(--secondary-color);
+    }
+
+    .main-nav ul li a {
+        display: block; 
+        padding: 15px 20px;
+        text-align: left;
+    }
+
+    /* ESTADO ACTIVO (VISIBLE) - Muestra el menú */
+    .main-nav.active {
+        max-height: 500px; 
+    }
+    
+    /* Ajuste de Grilla de Consejos a 1 columna */
+    .consejos-grid { 
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+/* --- REGLA DE RESPONSIVE PARA TABLAS --- */
+.table-responsive {
+    /* Permite el scroll horizontal en dispositivos pequeños */
+    overflow-x: auto;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Opcional: Estilos base para la tabla para asegurar legibilidad */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--text-color-dark);
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+    white-space: nowrap; /* Evita que el contenido de las celdas se rompa, forzando el scroll */
+}
+
+/* Estilo para las filas rayadas (simula is-striped) */
+.table.is-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+/* Nuevo estilo para la tarjeta de formularios */
+.form-wrapper.card {
+    background-color: var(--white-color);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+}
+/* Asegura que form-wrapper siempre centre el formulario */
+.form-wrapper {
+    max-width: 400px; /* Limita el ancho */
+    margin: 40px auto; /* Centra horizontalmente */
+    padding: 20px;
+}
+/* Estilo general para contenedores tipo tarjeta/cuadro */
+.card {
+    background-color: var(--white-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px; /* Espacio entre tarjetas de historial */
+}
+
+.card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.card-content {
+    padding: 20px;
+}
+/* barra_nav.html usa main-header */
+.main-header {
+    background-color: var(--white-color);
+    padding: 20px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Sombra más suave */
+    border-top: 5px solid var(--primary-color); /* Línea superior decorativa */
+}
+
+.main-nav ul li a:hover {
+    color: var(--accent-color); /* Usa tu color de acento */
+    border-bottom: 2px solid var(--accent-color);
 }

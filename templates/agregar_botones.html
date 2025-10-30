@@ -23,7 +23,7 @@
     <div class="columns is-multiline is-centered">
         {% for metrica_key, metrica_title in metric_options.items() %}
         <div class="column is-one-third">
-            <a href="{{ url_for('agregar_metrica_individual', metrica=metrica_key) }}" class="button is-large is-fullwidth is-info is-light has-text-weight-bold">
+            <a href="{{ url_for('agregar_metrica_individual', metrica=metrica_key) }}" class="button is-large is-fullwidth is-success has-text-weight-bold">
                 {{ metrica_title }}
             </a>
         </div>

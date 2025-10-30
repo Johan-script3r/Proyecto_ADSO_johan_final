@@ -1,29 +1,19 @@
+{% extends 'base.html' %} 
 
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reseñas Médicas - Salud y Confianza</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <script type="importmap">
-        {
-            "imports": {}
-        }
-    </script>
-    <script type="module" src="script.js"></script>
-</head>
-<body>
+{% block content %}
     {% include "barra_nav.html" %}
     
-    <main>
+    <main class="site-content">
         <section id="inicio" class="hero-section">
             <div class="container">
                 <h2>Hola! Bienvenido a Salud y Confianza</h2>
                 <p>La página en la que podras Registrar tus datos medicos y encontrar consejos sobre el cuidado de tu salud.</p>
-                <a href="{{ url_for('index') }}" class="button">Empezar Ahora</a>
+                
+                <a href="{{ url_for('index') }}" class="button is-primary">Empezar Ahora</a>
+                <button class="button is-warning ml-3" id="showQrButton">
+                    <span class="icon"><i class="fas fa-qrcode"></i></span>
+                    <span>Mi Código QR</span>
+                </button>
             </div>
         </section>
         
@@ -56,6 +46,57 @@
                 
             </div>
         </section>
-    {% include "pie_pagina.html"%}
-</body>
-</html>
+    </main>
+
+    <div class="modal" id="qrModal">
+        <div class="modal-background"></div>
+        <div class="modal-content" style="max-width: 380px;">
+            <div class="box has-text-centered">
+                <p class="title is-4">Código QR Personal</p>
+                <p class="subtitle is-6">Escanea para compartir tu perfil.</p>
+                
+                <img src="{{ url_for('static', filename='./jpg/url_qrcodecreator.com_22_26_07.png') }}" 
+                     alt="Código QR del Perfil" 
+                     style="width: 100%; height: auto; max-width: 300px; margin: 20px auto;">
+            </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const qrModal = document.getElementById('qrModal');
+            const showQrButton = document.getElementById('showQrButton');
+            
+            const closeModals = () => {
+                if (qrModal) {
+                    qrModal.classList.remove('is-active');
+                }
+            }
+
+            if (showQrButton && qrModal) {
+                showQrButton.addEventListener('click', () => {
+                    qrModal.classList.add('is-active');
+                });
+            }
+
+            const modalBackground = qrModal ? qrModal.querySelector('.modal-background') : null;
+            const modalCloseButton = qrModal ? qrModal.querySelector('.modal-close') : null;
+
+            if (modalBackground) {
+                modalBackground.addEventListener('click', closeModals);
+            }
+
+            if (modalCloseButton) {
+                modalCloseButton.addEventListener('click', closeModals);
+            }
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === "Escape") {
+                    closeModals();
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

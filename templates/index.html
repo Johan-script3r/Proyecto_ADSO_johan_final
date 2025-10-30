@@ -11,13 +11,30 @@
             {% for category, message in messages %}
                 
             {% endfor %}
-        {% endif %}
+        {% endif %}\
     {% endwith %}
     
     <div class="columns is-multiline">
+        
+        <div class="column is-one-third">
+            <div class="card is-info-card"> <div class="card-content">
+                    <p class="title is-4">Tasa Metabólica Basal (TMB)</p>
+                    {% if tmb_valor %}
+                        <p class="subtitle is-2 has-text-primary">{{ tmb_valor }} <span class="is-size-5 has-text-weight-normal">Kcal/día</span></p>
+                        <p class="is-size-7 has-text-grey">Energía mínima para el funcionamiento del cuerpo en reposo.</p>
+                    {% else %}
+                        <p class="notification is-warning is-small">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            No se pudo calcular. Motivo: {{ tmb_error }}.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
         {% if latest_metrics %}
             {% for metric_key, record in latest_metrics.items() %}
-                {% if record %}
+                {% if record and metric_key not in ['peso', 'altura'] %}
                     <div class="column is-one-third">
                         <div class="card">
                             <div class="card-content">
@@ -31,11 +48,9 @@
                                     {% elif metric_key == 'nivel_azucar' or metric_key == 'colesterol' %}
                                         {{ record.valor }} mg/dL
                                     {% elif metric_key == 'oxigeno_sangre' %}
-                                        {{ record.valor }}%
-                                    {% elif metric_key == 'peso' %}
-                                        {{ record.valor }} kg
-                                    {% elif metric_key == 'altura' %}
-                                        {{ record.valor }} cm
+                                        {{ record.valor }} %
+                                    {% else %}
+                                        {{ record.valor }}
                                     {% endif %}
                                 </p>
                             </div>
@@ -43,6 +58,22 @@
                     </div>
                 {% endif %}
             {% endfor %}
+            
+            {% for metric_key in ['peso', 'altura'] %}
+                {% set record = latest_metrics.get(metric_key) %}
+                {% if record %}
+                    <div class="column is-one-third">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title is-4 is-capitalized">{{ metric_key | replace('_', ' ') }}</p>
+                                <p class="subtitle is-6">Última toma: {{ record.fecha.strftime('%Y-%m-%d %H:%M') }}</p>
+                                <p class="is-size-3">{{ record.valor }} {% if metric_key == 'peso' %}kg{% else %}cm{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            
         {% else %}
              <div class="column is-full">
                 <p class="notification is-info">No se encontraron registros recientes. Por favor, <a href="{{ url_for('agregar_registro') }}">agrega un nuevo registro</a>.</p>

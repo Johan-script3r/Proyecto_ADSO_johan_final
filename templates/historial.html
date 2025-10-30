@@ -6,56 +6,115 @@
 <div class="container">
     <h1 class="title is-2">Historial Completo de Registros</h1>
     
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="notification is-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     {% if historial_data and historial_data.keys() | length > 0 %}
         
         <div class="content">
             {% for metric_key, records in historial_data.items() %}
                 {% if records %}
-                    <h2 class="subtitle is-3 is-capitalized">{{ metric_key | replace('_', ' ') }}</h2>
-                    <div class="table-container">
-                        <table class="table is-striped is-fullwidth is-hoverable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Fecha</th>
-                                    {% if metric_key == 'presiones' %}
-                                        <th>Sistólica (mmHg)</th>
-                                        <th>Diastólica (mmHg)</th>
-                                    {% else %}
-                                        <th>Valor</th>
-                                    {% endif %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for record in records %}
-                                    <tr>
-                                        <td>{{ record.id }}</td>
-                                        <td>{{ record.fecha.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                                        {% if metric_key == 'presiones' %}
-                                            <td>{{ record.sistolica }}</td>
-                                            <td>{{ record.diastolica }}</td>
-                                        {% else %}
-                                            <td>{{ record.valor }}</td>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="card mb-5"> 
+                        <div class="card-header">
+                            <h2 class="subtitle is-3 is-capitalized">{{ metric_key | replace('_', ' ') }}</h2>
+                        </div>
+                        <div class="card-content">
+                            
+                            <div class="field is-horizontal mb-5">
+                                <div class="field-label is-normal">
+                                    <label class="label" for="dateFilter_{{ metric_key }}">Filtrar por Fecha:</label>
+                                </div>
+                                <div class="field-body">
+                                    <div class="field">
+                                        <p class="control">
+                                            <input type="date" 
+                                                   class="input date-filter" 
+                                                   id="dateFilter_{{ metric_key }}"
+                                                   data-target-table="table_{{ metric_key }}">
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table is-striped is-fullwidth is-hoverable" id="table_{{ metric_key }}"> 
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            {% if metric_key == 'presiones' %}
+                                                <th>Sistólica (mmHg)</th>
+                                                <th>Diastólica (mmHg)</th>
+                                            {% else %}
+                                                <th>Valor</th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for record in records %}
+                                            <tr>
+                                                <td>{{ record.id }}</td>
+                                                <td class="record-date">{{ record.fecha.strftime('%Y-%m-%d') }}</td>
+                                                {% if metric_key == 'presiones' %}
+                                                    <td>{{ record.sistolica }}</td>
+                                                    <td>{{ record.diastolica }}</td>
+                                                {% else %}
+                                                    <td>{{ record.valor }}</td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 {% endif %}
             {% endfor %}
         </div>
         
     {% else %}
-        
+        <p class="notification">No tienes registros médicos en el historial.</p>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Selecciona todos los campos de entrada de fecha
+    const dateFilters = document.querySelectorAll('.date-filter');
+
+    dateFilters.forEach(input => {
+        // Asigna el evento 'change' (cuando se selecciona una fecha) o 'keyup' (si fuera texto)
+        input.addEventListener('change', function() {
+            const filterDate = this.value; // Formato YYYY-MM-DD
+            
+            // Obtiene el ID de la tabla a la que debe afectar este input
+            const tableId = this.getAttribute('data-target-table');
+            const table = document.getElementById(tableId);
+            
+            if (!table) return;
+
+            // Itera sobre todas las filas del cuerpo de la tabla (<tbody>)
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                // Obtiene la celda que contiene la fecha (la segunda columna, índice 1)
+                const dateCell = row.querySelector('.record-date');
+                if (!dateCell) return;
+                
+                // Extrae solo la fecha (YYYY-MM-DD)
+                const recordDate = dateCell.textContent.trim(); 
+                
+                let rowIsVisible = true;
+
+                if (filterDate) {
+                    // Si hay una fecha de filtro seleccionada
+                    if (recordDate !== filterDate) {
+                        rowIsVisible = false; // Ocultar si la fecha no coincide
+                    }
+                }
+
+                // Muestra u oculta la fila
+                row.style.display = rowIsVisible ? '' : 'none';
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

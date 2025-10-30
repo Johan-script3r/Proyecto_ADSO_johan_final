@@ -4,10 +4,11 @@
             <h1>Salud<span>&amp;</span>Confianza</h1>
         </div>
         
-        <button class="menu-toggle" aria-label="Toggle navigation" id="menu-toggle">
-            &#9776; </button>
-
-        <nav class="main-nav" id="main-nav">
+        <button class="menu-toggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <nav class="main-nav">
             <ul>
                 <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
                 <li><a href="{{ url_for('index') }}">Panel</a></li>
@@ -26,9 +27,3 @@
 </header>
 <br>
 <br>
-
-<script>
-    document.getElementById('menu-toggle').onclick = function() {
-        document.getElementById('main-nav').classList.toggle('active');
-    };
-</script>

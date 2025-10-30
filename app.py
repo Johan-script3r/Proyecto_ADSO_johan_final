@@ -194,7 +194,7 @@ def index():
 
     user_id = session['usuario_id']
     
-    # Obtener el último registro de cada métrica
+    # Obtener el último registro de cada métrica (código existente)
     latest_metrics = {
         'ritmo_cardiaco': get_latest_record(RitmoCardiaco, user_id),
         'presion_arterial': get_latest_record(PresionArterial, user_id),
@@ -204,9 +204,14 @@ def index():
         'peso': get_latest_record(Peso, user_id),
         'altura': get_latest_record(Altura, user_id),
     }
+
+    # ⚠️ AÑADIDO: Cálculo de TMB
+    tmb_valor, tmb_error = calcular_tmb(user_id) # Llama a la nueva función
     
-    # La plantilla 'index.html' necesitará adaptarse para mostrar este diccionario
-    return render_template('index.html', latest_metrics=latest_metrics)
+    return render_template('index.html', 
+                           latest_metrics=latest_metrics,
+                           tmb_valor=tmb_valor, 
+                           tmb_error=tmb_error)
 
 METRIC_OPTIONS = {
     'ritmo_cardiaco': 'Ritmo Cardíaco (ppm)',
@@ -492,35 +497,61 @@ def logout():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        nombre = request.form['nameUser']
-        password = request.form['passwordUser']
-        email = request.form['emailUser']
-        edad = request.form.get('edadUser', type=int)
-        sexo = request.form.get('sexoUser')
-        telefono = request.form.get('telefonoUser')
-        if Usuario.query.filter_by(nombre=nombre).first():
-            flash("Ese usuario ya existe", "error")
+        name_user = request.form['nameUser']
+        password_user = request.form['passwordUser']
+        email = request.form.get('email') # Asegúrate de que este campo exista en registro.html
+        
+        # RECIBIR LOS DATOS REQUERIDOS PARA TMB Y OPCIONALES
+        edad_str = request.form.get('edad')
+        sexo = request.form.get('sexo')
+        telefono = request.form.get('telefono')
+
+        # 1. Validar si el usuario o email ya existen
+        if Usuario.query.filter((Usuario.nombre == name_user) | (Usuario.email == email)).first():
+            flash('El nombre de usuario o email ya existe. Por favor, elige otro.', 'warning')
             return redirect(url_for('registro'))
+        
+        # 2. Validación de edad y sexo (obligatoria para TMB)
+        try:
+            if not edad_str or not sexo:
+                raise ValueError("La Edad y el Sexo son campos obligatorios para el cálculo de la TMB.")
             
-        if Usuario.query.filter_by(email=email).first():
-            flash("Ese correo electrónico ya está registrado", "error")
+            edad = int(edad_str) 
+            if edad <= 0 or edad > 150:
+                raise ValueError("La edad debe ser un número positivo y realista.")
+        except (ValueError, TypeError) as e:
+            flash(f'Error de validación: {str(e)}', 'error')
             return redirect(url_for('registro'))
 
+        # 3. Validación de sexo (solo para asegurar consistencia, ya que el select en HTML ayuda)
+        if sexo.lower() not in ['masculino', 'femenino']:
+             flash('Debes seleccionar un sexo válido.', 'error')
+             return redirect(url_for('registro'))
+        
+        # 4. Hash de la contraseña
+        hashed_password = generate_password_hash(password_user, method='pbkdf2:sha256')
+        
+        # 5. Crear el nuevo usuario
         nuevo_usuario = Usuario(
-            nombre=nombre,
-            email=email, # Asignar el email
-            edad=edad, # Asignar la edad
-            sexo=sexo, # Asignar el sexo
-            telefono=telefono # Asignar el teléfono
+            nombre=name_user, 
+            password_hash=hashed_password, 
+            email=email,
+            edad=edad, 
+            sexo=sexo, 
+            telefono=telefono,
+            rol='user'
         )
-        nuevo_usuario.set_password(password)
-        db.session.add(nuevo_usuario)
-        db.session.commit()
-
-        flash("Usuario registrado correctamente", "success")
-        return redirect(url_for('login'))
-
-    return render_template("registro.html")
+        
+        try:
+            db.session.add(nuevo_usuario)
+            db.session.commit()
+            flash('¡Registro exitoso! Ya puedes iniciar sesión.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al guardar el usuario: {str(e)}', 'error')
+            
+    return render_template('registro.html')
     
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -949,6 +980,43 @@ def eliminar_consejo(consejo_id):
         db.session.rollback()
         flash(f'Error al eliminar el consejo: {str(e)}', 'error')
         return redirect(url_for('consejos'))
+    
+# --- Función de Cálculo de Tasa Metabólica Basal (TMB) ---
+def calcular_tmb(usuario_id):
+    """Calcula la TMB (en Kcal/día) usando la fórmula de Mifflin-St Jeor."""
+    
+    usuario = Usuario.query.get(usuario_id)
+    # Validamos que existan los datos obligatorios del usuario
+    if not usuario or usuario.edad is None or usuario.sexo is None:
+        return None, "Faltan datos (Edad o Sexo) del usuario en tu perfil."
+
+    # 1. Obtener la última Altura (cm) y Peso (kg)
+    # Altura y Peso son necesarios para el cálculo. Se asume que Altura.valor está en cm y Peso.valor en kg.
+    ultima_altura_obj = Altura.query.filter_by(usuario_id=usuario_id).order_by(Altura.fecha.desc()).first()
+    ultimo_peso_obj = Peso.query.filter_by(usuario_id=usuario_id).order_by(Peso.fecha.desc()).first()
+
+    if not ultimo_peso_obj or not ultima_altura_obj:
+        return None, "Faltan registros de Altura o Peso para calcular la TMB."
+
+    altura_cm = ultima_altura_obj.valor
+    peso_kg = ultimo_peso_obj.valor
+    edad = usuario.edad
+    sexo = usuario.sexo.lower()
+
+    # Fórmula de Mifflin-St Jeor: TMB = (10 * P) + (6.25 * A) - (5 * E) + S
+    
+    if sexo == 'masculino':
+        s = 5
+    elif sexo == 'femenino':
+        s = -161
+    else:
+        # Esto debería estar cubierto por la validación en el registro, pero es una salvaguarda
+        return None, "Sexo no válido para el cálculo (use 'Masculino' o 'Femenino')."
+
+    tmb = (10 * peso_kg) + (6.25 * altura_cm) - (5 * edad) + s
+    
+    # Retorna el valor de TMB redondeado a dos decimales y sin errores
+    return round(tmb, 2), None
     
 if __name__ == '__main__':
     with app.app_context():

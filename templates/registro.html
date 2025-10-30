@@ -3,51 +3,56 @@
 {% block title %}Registro - Salud & Confianza{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="form-wrapper">
-        <div class="service-item">
-            <h4>Crear Cuenta</h4>
-            <form method="post" action="{{ url_for('registro') }}">
-                
-                <div class="form-group">
-                    <label for="nameUser">Usuario</label>
-                    <input type="text" name="nameUser" id="nameUser" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="emailUser">Correo Electrónico</label>
-                    <input type="email" name="emailUser" id="emailUser" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="passwordUser">Contraseña</label>
-                    <input type="password" name="passwordUser" id="passwordUser" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edadUser">Edad</label>
-                    <input type="number" name="edadUser" id="edadUser" class="form-control" min="1" max="120" placeholder="Opcional">
-                </div>
-                
-                <div class="form-group">
-                    <label for="sexoUser">Sexo</label>
-                    <select name="sexoUser" id="sexoUser" class="form-control">
-                        <option value="">Seleccionar (Opcional)</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="femenino">Femenino</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="telefonoUser">Teléfono</label>
-                    <input type="tel" name="telefonoUser" id="telefonoUser" class="form-control" placeholder="Opcional">
-                </div>
-                <button type="submit" class="button w-100">Registrarme</button>
-            </form>
-            <br>
-            <a href="{{ url_for('login') }}">Volver al inicio de Sesión</a>
+<div class="service-item" style="max-width: 500px; margin: 0 auto;">
+    <h4 style="margin-bottom: 20px;">Crear Cuenta</h4>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification is-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('registro') }}">
+        
+        <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+            <label for="nameUser">Usuario</label>
+            <input type="text" name="nameUser" id="nameUser" class="form-control" required>
         </div>
-    </div>
+        
+        <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+            <label for="email">Correo Electrónico</label>
+            <input type="email" name="email" id="email" class="form-control" required>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+            <label for="passwordUser">Contraseña</label>
+            <input type="password" name="passwordUser" id="passwordUser" class="form-control" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+            <label for="edad">Edad (años)</label>
+            <input type="number" name="edad" id="edad" class="form-control" min="1" max="150" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+            <label for="sexo">Sexo</label>
+            <select name="sexo" id="sexo" class="form-control" required>
+                <option value="" disabled selected>Selecciona tu sexo</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+            </select>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+            <label for="telefono">Teléfono (Opcional)</label>
+            <input type="text" name="telefono" id="telefono" class="form-control">
+        </div>
+
+        <button type="submit" class="button w-100">Registrarme</button>
+    </form>
+    <br>
+    <a href="{{ url_for('login') }}">Volver al inicio de Sesión</a>
 </div>
 {% endblock %}
